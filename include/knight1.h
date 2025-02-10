@@ -1,8 +1,12 @@
-#ifndef KNIGHT1_H    // Conventionally uppercase
+#ifndef KNIGHT1_H
 #define KNIGHT1_H
 #include <raylib.h>
+#include "orc1.h"
 
-typedef struct {
+// Remove the typedef for Orc
+struct Orc;  // Forward declaration without typedef
+
+typedef struct Knight{
     Texture2D texture;
     Rectangle frameRec;
     Vector2 position;
@@ -19,10 +23,21 @@ typedef struct {
     int framesSpeed;
     bool flipSprite;
     bool isAttacking;
-} Knight;           // Capitalize Knight as it's a type name
+} Knight;
 
-// Function names should be consistent with the type name
+typedef enum KnightAnimationState {
+    KNIGHT_IDLE = 0,
+    KNIGHT_RUN = 1,
+    KNIGHT_ATTACK = 2,
+    KNIGHT_ARROW = 4,
+    KNIGHT_HIT = 6,
+    KNIGHT_DEATH = 7
+} KnightAnimationState;
+
 void InitKnight(Knight* knight, int screenWidth, int screenHeight);
 void RenderKnight(Knight* knight);
+void UpdateKnight(Knight* knight, KnightAnimationState currentAnimation);
+void MoveKnight(Knight* knight, KnightAnimationState* currentAnimation, bool* isAttacking);
+void CheckKnightAttackCollision(Knight* knight, struct Orc* orc, bool* isAttacking, OrcAnimationState* currentAnimation);
 
 #endif

@@ -18,47 +18,55 @@
 #include <stdlib.h>
 #include <string.h>
 #include <raylib.h>
-#include <constants.h>
-#include <knight1.h>
+#include "knight1.h"
+#include "orc1.h"
 
+
+#define MAX_FRAME_SPEED 15
+#define MIN_FRAME_SPEED 1
+
+// init game screens
+typedef enum GameScreen
+{
+    SplashScreen = 0,
+    StartScreen,
+    Level_1
+} GameScreen;
 
 int main(void)
 {
     // init game screen 
     const int screenWidth = 1800;
     const int screenHeight = 1000;
-    InitWindow(screenWidth, screenHeight, "RE_CLONE");    
+    InitWindow(screenWidth, screenHeight, "Knighty Knight");    
     
     // load knight sprite
     Knight knight;
-    Initknight(&knight, screenWidth, screenHeight);
-
+    InitKnight(&knight, screenWidth, screenHeight);
+    // load orc sprite
+    Orc orc;
+    InitOrc(&orc, screenWidth, screenHeight);
     
-    //Rectangle knightFrameRec = {0.0f, 0.0f, SPRITE_WIDTH, SPRITE_HEIGHT};
-
+    // init frames
     int currentFrame = 0;
-
     int framesCounter = 0;
     int framesSpeed = 8;
    
-    
     // init current screen
-    // GameScreen currentScreen = SplashScreen;
     GameScreen currentScreen = Level_1;
 
-    knightAnimationState currentAnimation = IDLE;
+    KnightAnimationState currentAnimationKnight = KNIGHT_IDLE;
+    OrcAnimationState currentAnimationOrc = ORC_IDLE;
 
     bool knightFlipSprite = false;
     bool isAttacking = false;
 
-    
-    
     int fontSize = 50;
     
     SetTargetFPS(60);
     while (!WindowShouldClose())
     {
-    
+        // Game logic update
         switch(currentScreen)
         {
             case SplashScreen:
@@ -79,89 +87,29 @@ int main(void)
             }
             case Level_1:
             {
-                // Syntax corrections:
-                // 1. Fixed missing parenthesis
-                // 2. Corrected variable declaration (removed '+')
-                // 3. Fixed logical errors in key checking
-                if(IsGamepadAvailable(0)) {
-                    float axisX = GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X);
-                    float axisY = GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_Y);
-                    
-                    // Gamepad movement logic
-                    if(axisX != 0 || axisY != 0) {
-                        currentAnimation = RUN;
-                    } else {
-                        currentAnimation = IDLE;
-                    }
-                
-                }
-                // Keyboard movement logic
-                // Corrected logical OR/AND conditions
-                if(IsKeyDown(KEY_W)) {
-                    currentAnimation = isAttacking?ATTACK:RUN;
-                    knight.dest.y--;
-                } 
-                else if(IsKeyDown(KEY_S)) {
-                    currentAnimation = isAttacking?ATTACK:RUN;
-                    knight.dest.y++;
-                } 
-                else if(IsKeyDown(KEY_A)) {
-                    currentAnimation = isAttacking?ATTACK:RUN;
-                    knightFlipSprite=false;
-                    knight.dest.x--;
-                } 
-                else if(IsKeyDown(KEY_D)) {
-                     currentAnimation = isAttacking?ATTACK:RUN;
-                    currentAnimation = RUN;
-                    knightFlipSprite=true;
-                    knight.dest.x++;
-                }
-                
-                else{
-                    currentAnimation = isAttacking ? ATTACK:IDLE;
-                    
-                }
-                
-                if(IsKeyDown(KEY_SPACE))
-                {
-                    isAttacking=true;
-                    currentAnimation=ATTACK;
-                }
-                else{
-                    isAttacking=false;
-                }
-                //flip sprite
-                const float knight_BASE_WIDTH = knight.frameWidth;
+                UpdateOrc(&orc, currentAnimationOrc);
+                MoveKnight(&knight, &currentAnimationKnight, &isAttacking);
+                UpdateKnight(&knight, currentAnimationKnight);
+                CheckKnightAttackCollision(&knight, &orc, &isAttacking, &currentAnimationOrc);
+                OrcTakingDamage(&orc, orc.health, &currentAnimationOrc);
+                //Moveorc(&orc, &currentAnimationOrc, &isAttacking);
+                //CheckKnightAttackCollision(&knight, &orc, &isAttacking);
+                //OrcTakingDamage(&orc, 50, &currentAnimationOrc);
 
+                // Sprite flipping logic
+                const float knight_BASE_WIDTH = knight.frameWidth;
                 knight.frameRec.width = knightFlipSprite ? knight_BASE_WIDTH : -knight_BASE_WIDTH;
 
-                
                 // Animation frame logic
                 framesCounter++;
                 
-                if(framesCounter >= (60/framesSpeed)) {
-                    framesCounter = 0;
-                    currentFrame++;
-                    
-                    // Note: Changed knightFrameCounts to frameCounts
-                    if(currentFrame >= knightFrameCounts[currentAnimation])
-                        currentFrame = 0;
-                    
-                    // Note: Changed knightFrameRec to soldierFrameRec
-                    knight.frameRec.x = currentFrame * knight.frameWidth;
-                    knight.frameRec.y = currentAnimation * knight.frameHeight;
-                    
-                    knight.frameRec.height = knight.frameHeight;
-                }
-                
                 break;
             }
-            
+        }
         
-    }
-
-    BeginDrawing();
-    ClearBackground(RAYWHITE);
+        // Drawing
+        BeginDrawing();
+        ClearBackground(RAYWHITE);
         
         switch(currentScreen)
         {
@@ -169,29 +117,24 @@ int main(void)
             {
                 DrawText("SplashScreen", (screenWidth/2), 5, 50, BLACK);
                 int xButtonWidth = MeasureText("Press X Button", fontSize);
-
                 DrawText("Press X Button", (screenWidth/2)-(xButtonWidth/2), screenHeight-fontSize, 50, BLACK);
                 break;
             }
             case StartScreen:
             {
                 DrawText("StartScreen", (screenWidth/2), 5, 50, BLACK);
-                 int startButtonWidth = MeasureText("Press Start Button", fontSize);
-
+                int startButtonWidth = MeasureText("Press Start Button", fontSize);
                 DrawText("Press Start Button", (screenWidth/2)-(startButtonWidth/2), screenHeight-fontSize, 50, BLACK);
-                
                 break;
             }
             case Level_1:
             {
                 DrawText("Level 1", (screenWidth/2), 5, 50, BLACK);
 
+                RenderOrc(&orc);
+                RenderKnight(&knight);
                 
-                Renderknight(&knight);
-                //DrawTextureRec(knight, knightFrameRec, position, WHITE);
-
-                //DrawTextureEx(knight, position, 0.0f, scale, WHITE);
-
+                // Optional: Draw bounding box for knight
                 DrawRectangleLines(
                     knight.origin.x+(screenWidth/2)-(knight.frameRec.width*knight.scale/2), 
                     knight.origin.y+(screenHeight/2)-(knight.frameRec.height*knight.scale/2), 
@@ -205,12 +148,9 @@ int main(void)
         
         EndDrawing();
     }
-    CloseAudioDevice();
+    
     CloseWindow();
-
     return 0;    
-
-
 }
 
 

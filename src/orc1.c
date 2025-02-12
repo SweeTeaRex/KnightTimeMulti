@@ -1,6 +1,7 @@
 #include "orc1.h"
 #include "knight1.h"
 #include <raylib.h>
+#include <stdio.h>
 
 const int orcFrameCounts[] = {
     6,  // IDLE
@@ -49,59 +50,56 @@ void RenderOrc(Orc* orc) {
     if(orc->flipSprite)
     {
         orcSourceRectangle.width = -orc->frameRec.width;
+        DrawTexturePro(orc->texture, orcSourceRectangle, orc->dest, orc->origin, 0.0f, WHITE);
         
         
     } else {
+        
         orcSourceRectangle.width = orc->frameRec.width;
+        DrawTexturePro(orc->texture, orcSourceRectangle, orc->dest, orc->origin, 0.0f, WHITE);
 
         
     }
 
-    DrawTexturePro(orc->texture, orcSourceRectangle, orc->dest, 
-                   orc->origin, 0.0f, WHITE);
+    
 }
 
-void UpdateOrc(Orc* orc, OrcAnimationState currentAnimation)
+void UpdateOrc(Orc* orc, OrcAnimationState* currentAnimation)
 {
-    if(!orc->isAlive)
-    {
-        currentAnimation = ORC_DEATH;
+    if (currentAnimation == NULL || orc == NULL) return;
+
+    // Force death animation if not alive
+    if (!orc->isAlive) {
+        *currentAnimation = ORC_DEATH;
     }
     
     orc->framesCounter++;
-    if(orc->framesCounter >= (60/orc->framesSpeed))
+    if (orc->framesCounter >= (60 / orc->framesSpeed))
     {
         orc->framesCounter = 0;
         orc->currentFrame++;
         
-        // Ensure we don't go out of bounds for the specific animation
-        int maxFrames = 4;  // Default to a safe maximum
-        switch(currentAnimation) {
-            case ORC_IDLE: maxFrames = 6; break;
-            case ORC_RUN: maxFrames = 8; break;
-            case ORC_ATTACK: maxFrames = 6; break;
-            case ORC_HIT: maxFrames = 4; break;
-            case ORC_DEATH: maxFrames = 4; break;
-            default: maxFrames = 4; break;
+        int maxFrames = 4;  // Death animation frames
+
+        switch(*currentAnimation)
+        {
+            case ORC_IDLE: maxFrames=6; break;
+            case ORC_RUN: maxFrames=8; break;
+            case ORC_ATTACK: maxFrames=6; break;
+            case ORC_HIT: maxFrames=4; break;
+            case ORC_DEATH: maxFrames=4; break;
+            default: maxFrames=4; break;
         }
         
-        if(orc->currentFrame >= maxFrames)
+        if (orc->currentFrame >= maxFrames)
         {
-            if(currentAnimation == ORC_DEATH)
-            {
-                // Stop at the last frame of death animation
-                orc->currentFrame = maxFrames - 1;
-            } 
-            else 
-            {
-                // Reset to first frame for other animations
-                orc->currentFrame = 0;
-            }
+            // Stop at the last frame of death animation
+            orc->currentFrame = maxFrames - 1;
         }
         
         // Update frame rectangle
         orc->frameRec.x = orc->currentFrame * orc->frameWidth;
-        orc->frameRec.y = currentAnimation * orc->frameHeight;
+        orc->frameRec.y = ORC_DEATH * orc->frameHeight;
         orc->frameRec.height = orc->frameHeight;
     }
 }
@@ -163,6 +161,17 @@ void OrcTakingDamage(Orc* orc, int damage, OrcAnimationState* currentAnimation)
         // Update animation state to death if needed
         if (currentAnimation != NULL) {
             *currentAnimation = ORC_DEATH;
+            printf("\nHIT\n");
         }
+        
     }
-}
+    else
+    {
+        if(currentAnimation != NULL)
+        {
+            *currentAnimation=ORC_HIT;
+            printf("\nDEAD\n");
+        }
+
+    }
+}       

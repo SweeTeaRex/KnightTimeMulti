@@ -87,15 +87,17 @@ int main(void)
             }
             case Level_1:
             {
-                UpdateOrc(&orc, currentAnimationOrc);
+                
                 MoveKnight(&knight, &currentAnimationKnight, &isAttacking);
-                UpdateKnight(&knight, currentAnimationKnight);
-                CheckKnightAttackCollision(&knight, &orc, &isAttacking, &currentAnimationOrc);
-                OrcTakingDamage(&orc, orc.health, &currentAnimationOrc);
-                //Moveorc(&orc, &currentAnimationOrc, &isAttacking);
-                //CheckKnightAttackCollision(&knight, &orc, &isAttacking);
-                //OrcTakingDamage(&orc, 50, &currentAnimationOrc);
+                UpdateKnight(&knight, &currentAnimationKnight);
+                    
 
+                    
+                
+                CheckKnightAttackCollision(&knight, &orc, &isAttacking, &currentAnimationOrc);
+
+                UpdateOrc(&orc, &currentAnimationOrc);
+                
                 // Sprite flipping logic
                 const float knight_BASE_WIDTH = knight.frameWidth;
                 knight.frameRec.width = knightFlipSprite ? knight_BASE_WIDTH : -knight_BASE_WIDTH;

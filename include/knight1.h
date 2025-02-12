@@ -3,8 +3,8 @@
 #include <raylib.h>
 #include "orc1.h"
 
-// Remove the typedef for Orc
-struct Orc;  // Forward declaration without typedef
+// forward declaration for Orc
+struct Orc;
 
 typedef struct Knight{
     Texture2D texture;
@@ -36,7 +36,7 @@ typedef enum KnightAnimationState {
 
 void InitKnight(Knight* knight, int screenWidth, int screenHeight);
 void RenderKnight(Knight* knight);
-void UpdateKnight(Knight* knight, KnightAnimationState currentAnimation);
+void UpdateKnight(Knight* knight, KnightAnimationState* currentAnimation);
 void MoveKnight(Knight* knight, KnightAnimationState* currentAnimation, bool* isAttacking);
 void CheckKnightAttackCollision(Knight* knight, struct Orc* orc, bool* isAttacking, OrcAnimationState* currentAnimation);
 

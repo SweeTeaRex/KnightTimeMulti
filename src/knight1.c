@@ -1,6 +1,7 @@
 #include "knight1.h"
 #include "orc1.h"
 #include <raylib.h>
+#include <stdio.h>
 
 const int knightFrameCounts[]={
     6,
@@ -42,7 +43,7 @@ void InitKnight(Knight* knight, int screenWidth, int screenHeight) {
 
 
 
-void UpdateKnight(Knight* knight, KnightAnimationState currentAnimation)
+void UpdateKnight(Knight* knight, KnightAnimationState* currentAnimation)
 {
     knight->framesCounter++;
 
@@ -51,11 +52,11 @@ void UpdateKnight(Knight* knight, KnightAnimationState currentAnimation)
         knight->framesCounter=0;
         knight->currentFrame++;
 
-        if(knight->currentFrame>=knightFrameCounts[currentAnimation])
+        if(knight->currentFrame>=knightFrameCounts[*currentAnimation])
         knight->currentFrame=0;
 
         knight->frameRec.x=knight->currentFrame*knight->frameWidth;
-        knight->frameRec.y=currentAnimation * knight->frameHeight;
+        knight->frameRec.y=*currentAnimation * knight->frameHeight;
         knight->frameRec.height = knight->frameHeight;
     }
     
@@ -134,5 +135,6 @@ void CheckKnightAttackCollision(Knight* knight, Orc* orc, bool* isAttacking, Orc
     if(*isAttacking && CheckCollisionRecs(knightAttackRect, orcRect))
     {
         OrcTakingDamage(orc, 50, currentAnimation);
+        printf("\nCollision Check\n");
     }
 }

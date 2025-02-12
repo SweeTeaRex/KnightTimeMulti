@@ -37,13 +37,11 @@ typedef enum OrcAnimationState{
     ORC_DEATH=6
 } OrcAnimationState;
 
-void OrcTakingDamage(Orc* orc, int damage, OrcAnimationState* currentAnimation);
 void InitOrc(Orc* orc, int screenWidth, int screenHeight);
 void RenderOrc(Orc* orc);
-
-void UpdateOrc(Orc* orc, OrcAnimationState currentAnimation);
+void UpdateOrc(Orc* orc, OrcAnimationState* currentAnimation);
 void Moveorc(Orc* orc, OrcAnimationState* currentAnimation, bool* isAttacking);
-
+void OrcTakingDamage(Orc* orc, int damage, OrcAnimationState* currentAnimation);
 
 
 #endif

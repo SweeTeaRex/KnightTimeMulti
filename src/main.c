@@ -36,8 +36,8 @@ typedef enum GameScreen
 int main(void)
 {
     // init game screen 
-    const int screenWidth = 1800;
-    const int screenHeight = 1000;
+    const int screenWidth = 900;
+    const int screenHeight = 500;
     InitWindow(screenWidth, screenHeight, "Knighty Knight");    
     
     // load knight sprite
@@ -87,16 +87,17 @@ int main(void)
             }
             case Level_1:
             {
-                
+
+                CheckKnightAttackCollision(&knight, &orc, &isAttacking, &currentAnimationKnight);
                 MoveKnight(&knight, &currentAnimationKnight, &isAttacking);
                 UpdateKnight(&knight, &currentAnimationKnight);
-                    
-
+                UpdateOrc(&orc, &currentAnimationOrc);
+                
                     
                 
-                CheckKnightAttackCollision(&knight, &orc, &isAttacking, &currentAnimationOrc);
+            
 
-                UpdateOrc(&orc, &currentAnimationOrc);
+                
                 
                 // Sprite flipping logic
                 const float knight_BASE_WIDTH = knight.frameWidth;

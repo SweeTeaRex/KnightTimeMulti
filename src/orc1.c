@@ -68,10 +68,10 @@ void UpdateOrc(Orc* orc, OrcAnimationState* currentAnimation)
 {
     if (currentAnimation == NULL || orc == NULL) return;
 
-    // Force death animation if not alive
-    if (!orc->isAlive) {
-        *currentAnimation = ORC_DEATH;
-    }
+    printf("UpdateOrc - isAlive: %d, currentAnimation %d, currentFrames: %d\n",
+        orc->isAlive, *currentAnimation, orc->currentFrame);
+    
+    
     
     orc->framesCounter++;
     if (orc->framesCounter >= (60 / orc->framesSpeed))
@@ -80,28 +80,62 @@ void UpdateOrc(Orc* orc, OrcAnimationState* currentAnimation)
         orc->currentFrame++;
         
         int maxFrames = 4;  // Death animation frames
+        int effectiveFrames = 4;
 
         switch(*currentAnimation)
         {
-            case ORC_IDLE: maxFrames=6; break;
-            case ORC_RUN: maxFrames=8; break;
-            case ORC_ATTACK: maxFrames=6; break;
-            case ORC_HIT: maxFrames=4; break;
-            case ORC_DEATH: maxFrames=4; break;
-            default: maxFrames=4; break;
+            case ORC_IDLE: maxFrames=6;
+            effectiveFrames = 5; 
+            break;
+
+            case ORC_RUN: maxFrames=8; 
+            effectiveFrames = 7;
+            break;
+
+            case ORC_ATTACK: maxFrames=6; 
+            effectiveFrames = 5;
+            break;
+
+            case ORC_HIT: maxFrames=4; 
+            effectiveFrames = 3;
+            break;
+
+            case ORC_DEATH: maxFrames=4; 
+            effectiveFrames = 3;
+            break;
+
+            default: maxFrames=4; 
+            effectiveFrames = 3;
+            break;
         }
+
+        printf("Max Frames: %d\n", maxFrames);
         
-        if (orc->currentFrame >= maxFrames)
+        if (orc->currentFrame >= effectiveFrames)
         {
-            // Stop at the last frame of death animation
-            orc->currentFrame = maxFrames - 1;
+            if(*currentAnimation == ORC_DEATH)
+            {
+                orc->currentFrame = effectiveFrames - 1;
+            }
+            else if(*currentAnimation == ORC_HIT)
+            {
+                orc->currentFrame = 0;
+                *currentAnimation = ORC_IDLE;
+            }
+            else
+            {
+                orc->currentFrame = 0;
+            }
         }
         
         // Update frame rectangle
-        orc->frameRec.x = orc->currentFrame * orc->frameWidth;
-        orc->frameRec.y = ORC_DEATH * orc->frameHeight;
-        orc->frameRec.height = orc->frameHeight;
+        
+
+        printf("Frame Rec - x: %f, y: %f\n", orc->frameRec.x, orc->frameRec.y);
     }
+    orc->frameRec.x = orc->currentFrame * orc->frameWidth;
+    orc->frameRec.y = *currentAnimation * orc->frameHeight;
+    orc->frameRec.height = orc->frameHeight;
 }
 
 
@@ -153,15 +187,18 @@ void OrcTakingDamage(Orc* orc, int damage, OrcAnimationState* currentAnimation)
     if(!orc->isAlive) return;
     
     orc->health -= damage;
+    printf("\n %d = health", orc->health);
     if(orc->health <= 0)
     {
         orc->health = 0;
         orc->isAlive = false;
         
         // Update animation state to death if needed
-        if (currentAnimation != NULL) {
+        if (orc->isAlive == false) {
             *currentAnimation = ORC_DEATH;
-            printf("\nHIT\n");
+            printf("\nDEAD\n");
+            
+            
         }
         
     }
@@ -170,7 +207,7 @@ void OrcTakingDamage(Orc* orc, int damage, OrcAnimationState* currentAnimation)
         if(currentAnimation != NULL)
         {
             *currentAnimation=ORC_HIT;
-            printf("\nDEAD\n");
+            printf("\nHIT\n");
         }
 
     }

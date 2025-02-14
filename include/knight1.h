@@ -1,7 +1,7 @@
 #ifndef KNIGHT1_H
 #define KNIGHT1_H
 #include <raylib.h>
-#include "orc1.h"
+
 
 // forward declaration for Orc
 struct Orc;
@@ -38,6 +38,6 @@ void InitKnight(Knight* knight, int screenWidth, int screenHeight);
 void RenderKnight(Knight* knight);
 void UpdateKnight(Knight* knight, KnightAnimationState* currentAnimation);
 void MoveKnight(Knight* knight, KnightAnimationState* currentAnimation, bool* isAttacking);
-void CheckKnightAttackCollision(Knight* knight, struct Orc* orc, bool* isAttacking, OrcAnimationState* currentAnimation);
+void CheckKnightAttackCollision(Knight* knight, struct Orc* orc, bool* isAttacking, KnightAnimationState* currentAnimation);
 
 #endif

@@ -112,7 +112,7 @@ void MoveKnight(Knight* knight, KnightAnimationState* currentAnimation, bool* is
     }
 }
 
-void CheckKnightAttackCollision(Knight* knight, Orc* orc, bool* isAttacking, OrcAnimationState* currentAnimation)
+void CheckKnightAttackCollision(Knight* knight, Orc* orc, bool* isAttacking, KnightAnimationState* currentAnimation)
 {
     if(!*isAttacking) return;
     Rectangle knightAttackRect = {
@@ -122,9 +122,7 @@ void CheckKnightAttackCollision(Knight* knight, Orc* orc, bool* isAttacking, Orc
         knight->dest.height
 
     };
-    
-    
-    
+       
     Rectangle orcRect ={
         orc->dest.x,
         orc->dest.y,
@@ -136,5 +134,6 @@ void CheckKnightAttackCollision(Knight* knight, Orc* orc, bool* isAttacking, Orc
     {
         OrcTakingDamage(orc, 50, currentAnimation);
         printf("\nCollision Check\n");
+       
     }
 }

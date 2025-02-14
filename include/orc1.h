@@ -7,7 +7,7 @@
 struct Knight;
 
 typedef struct Orc {
-    // Existing Orc struct fields
+    // Existing Orc struct fieldsasdad
     Texture2D texture;
     Rectangle frameRec;
     Vector2 position;
@@ -42,6 +42,5 @@ void RenderOrc(Orc* orc);
 void UpdateOrc(Orc* orc, OrcAnimationState* currentAnimation);
 void Moveorc(Orc* orc, OrcAnimationState* currentAnimation, bool* isAttacking);
 void OrcTakingDamage(Orc* orc, int damage, OrcAnimationState* currentAnimation);
-
 
 #endif
